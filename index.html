@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Streaming Chat (Fetch)</title>
+</head>
+<body>
+  <h1>Streaming Chat Response</h1>
+  <button id="start">Start Chat</button>
+  <div id="output" style="white-space: pre-wrap; margin-top: 1em;"></div>
+
+  <script>
+    document.getElementById("start").addEventListener("click", async () => {
+      const output = document.getElementById("output");
+      output.textContent = "";
+
+      try {
+        const response = await fetch("http://localhost:5000/api/chat", {
+          method: "POST"
+        });
+
+        if (!response.body) {
+          output.textContent = "No response body received.";
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // Process complete lines (split on double newlines or single newlines)
+          let lines = buffer.split("\n");
+          buffer = lines.pop(); // Save incomplete line for next chunk
+
+          for (let line of lines) {
+            const match = line.match(/content='(.*?)'/);
+            if (match && match[1]) {
+              output.textContent += match[1];
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Streaming error:", error);
+        output.textContent = "Streaming failed. See console.";
+      }
+    });
+  </script>
+</body>
+</html>
