@@ -21,9 +21,9 @@ def chat_stream():
     def generate():
         for chunk in ask_ollama_stream(prompt=user_prompt, session_id=chat_id):
             # Stream as Server-Sent Events (SSE) format
-            output = chunk.get("output", None)
+            output = chunk.get("messages", None)
             if output:
-                yield f"data: {output}\n\n".encode("utf-8")
+                yield f"data: {output[0].content}\n\n".encode("utf-8")
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
