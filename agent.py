@@ -32,7 +32,7 @@ prompt = ChatPromptTemplate.from_messages(
             "system",
             """You are a helpful assistant. Respond in 20 words or fewer.
             If the user asks about their IP address, use the get_machine_ip tool. 
-            If the user asks about their Geo data, use the get_geo_data tool. Use the ip address from the get_machine_ip tool. 
+            If the user asks about their Geo data, use the get_geo_data tool. Use the ip address retrieved from the previous step. 
             If the user asks about the weather prognosis, use the get_weather tool. Use the city name from the get_geo_data tool. Pick only most relevant data from the response for each day.
             Otherwise, answer the question directly.""",
         ),
